@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penang 2026: Secret Santa 🌴🎅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #ff00ff;
+            --purple: #9d00ff;
+            --light-pink: #ffe6fa;
+            --bg-grad: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        }
+        
+        body {
+            font-family: 'VT323', monospace;
+            background: var(--bg-grad);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>💖</text></svg>") 16 0, auto; /* Custom Cursor */
+        }
+
+        /* Y2K Scrollbar */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #ffccff; border-left: 2px solid #ff00ff; }
+        ::-webkit-scrollbar-thumb { background: #ff00ff; border: 2px solid white; }
+
+        .y2k-box {
+            background: rgba(255, 255, 255, 0.9);
+            border: 4px solid var(--pink);
+            box-shadow: 8px 8px 0px var(--purple);
+            position: relative;
+        }
+
+        .y2k-btn {
+            background: var(--pink);
+            color: white;
+            border: 2px solid white;
+            box-shadow: 4px 4px 0px var(--purple);
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .y2k-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--purple);
+        }
+
+        .title-text {
+            text-shadow: 3px 3px 0px #fff, 5px 5px 0px var(--purple);
+        }
+
+        .pixel-input {
+            border: 2px solid var(--purple);
+            background: #fff0f5;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+        }
+
+        /* Profile Image Styling */
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 3px solid var(--pink);
+            transition: transform 0.2s;
+        }
+        .profile-btn:hover .profile-pic {
+            transform: scale(1.1) rotate(-5deg);
+            border-color: var(--purple);
+        }
+
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center text-purple-900">
+    
+    <div class="scanlines"></div>
+
+    <div id="page-start" class="text-center w-full max-w-lg">
+        <marquee class="bg-purple-700 text-white font-bold py-1 border-y-2 border-white mb-8 text-xl">
+            ✨ WELCOME TO PENANG 2026 ✨ GET IN LOSER, WE'RE GOING SHOPPING 🛍️ ✨
+        </marquee>
+
+        <div class="y2k-box p-8 flex flex-col items-center">
+            <h1 class="text-6xl font-bold title-text text-pink-500 mb-2 leading-none">SECRET<br>SANTA</h1>
+            <p class="text-2xl mb-6 bg-yellow-200 px-2">~ Penang Trip Edition ~</p>
+            
+            <div class="text-6xl mb-6 animate-bounce">🌴👙🎁</div>
+
+            <button onclick="nav('page-login')" class="y2k-btn text-3xl px-8 py-2 font-bold w-full hover:bg-purple-600">
+                ENTER SITE ->
+            </button>
+        </div>
+    </div>
+
+    <div id="page-login" class="hidden w-full max-w-lg">
+        <div class="y2k-box p-6 text-center">
+            <div class="bg-blue-600 text-white font-bold mb-4 px-2 py-1 flex justify-between items-center border-2 border-white shadow-sm">
+                <span>WHO_ARE_YOU?.EXE</span>
+                <span class="cursor-pointer">X</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-6 mt-4">
+                <button onclick="login('Fatin')" class="profile-btn flex flex-col items-center gap-2">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fatin" class="profile-pic rounded-full bg-white">
+                    <span class="text-2xl font-bold bg-pink-200 px-2">FATIN</span>
+                </button>
+
+                <button onclick="login('Damia')" class="profile-btn flex flex-col items-center gap-2">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Damia" class="profile-pic rounded-full bg-white">
+                    <span class="text-2xl font-bold bg-pink-200 px-2">DAMIA</span>
+                </button>
+
+                <button onclick="login('Anis')" class="profile-btn flex flex-col items-center gap-2">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Anis" class="profile-pic rounded-full bg-white">
+                    <span class="text-2xl font-bold bg-pink-200 px-2">ANIS</span>
+                </button>
+
+                <button onclick="login('Dzawani')" class="profile-btn flex flex-col items-center gap-2">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Dzawani" class="profile-pic rounded-full bg-white">
+                    <span class="text-2xl font-bold bg-pink-200 px-2">DZAWANI</span>
+                </button>
+            </div>
+        </div>
+        <button onclick="nav('page-start')" class="mt-4 text-xl underline decoration-wavy decoration-pink-500"><- Go Back</button>
+    </div>
+
+    <div id="page-dashboard" class="hidden w-full max-w-lg">
+        <div class="flex justify-between items-end mb-4">
+            <h2 id="greeting" class="text-4xl font-bold text-pink-600 title-text"></h2>
+            <button onclick="logout()" class="text-lg bg-red-500 text-white px-2 border-2 border-black hover:bg-red-600">LOGOUT</button>
+        </div>
+
+        <div class="y2k-box p-4 mb-8">
+            <h3 class="text-2xl font-bold bg-purple-200 inline-block px-2 mb-3 border border-purple-500">MY WISHLIST 📝</h3>
+            
+            <div class="flex flex-col gap-2 mb-4 bg-pink-50 p-3 border-2 border-pink-200 border-dashed">
+                <input id="wish-item" type="text" placeholder="Item Name (e.g. Lip Gloss)" class="pixel-input p-2 w-full outline-none focus:bg-white">
+                <input id="wish-link" type="text" placeholder="Link (Shopee/TikTok etc.)" class="pixel-input p-2 w-full outline-none focus:bg-white">
+                <button onclick="addWish()" class="y2k-btn py-1 mt-1 text-xl">ADD ITEM +</button>
+            </div>
+
+            <ul id="wishlist-display" class="space-y-2 text-left text-xl">
+                <li class="text-gray-400 italic">Loading list...</li>
+            </ul>
+        </div>
+
+        <div class="y2k-box p-4 bg-purple-50 border-purple-500">
+            <h3 class="text-2xl font-bold bg-pink-200 inline-block px-2 mb-3 border border-pink-500">SECRET SANTA ZONE 🤫</h3>
+            
+            <div id="status-open" class="text-center py-4">
+                <p class="text-xl mb-4">The names haven't been drawn yet!</p>
+                <button onclick="drawNames()" class="y2k-btn text-2xl px-6 py-3 w-full animate-pulse bg-purple-600">
+                    🎲 DRAW NAMES NOW 🎲
+                </button>
+                <p class="text-sm mt-2 text-gray-500">*Clicking this locks everyone's match forever!</p>
+            </div>
+
+            <div id="status-drawn" class="hidden text-left">
+                <p class="text-xl">You are the Secret Santa for:</p>
+                <div id="target-name" class="text-5xl font-bold text-pink-600 my-2 title-text tracking-widest">???</div>
+                
+                <div class="mt-4 border-t-2 border-purple-200 pt-2">
+                    <p class="font-bold bg-yellow-200 inline px-1">THEIR WISHLIST:</p>
+                    <ul id="target-wishlist" class="mt-2 space-y-2 text-lg">
+                        <li class="italic text-gray-500">Loading...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // -----------------------------------------------------
+        // TODO: PASTE FIREBASE CONFIG HERE
+        // -----------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3Y8HN2fqzwU4K-J6Bl1LY2pwv9GYzPgQ",
+            authDomain: "secretsanta-26c70.firebaseapp.com",
+            projectId: "secretsanta-26c70",
+            storageBucket: "secretsanta-26c70.firebasestorage.app",
+            messagingSenderId: "5754231336",
+            appId: "1:5754231336:web:23e25480d2da1b4e81b31d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // --- APP STATE ---
+        const participants = ["Fatin", "Damia", "Anis", "Dzawani"];
+        const docId = "penang_2026"; 
+        let currentUser = null;
+        let groupData = null;
+
+        // --- NAVIGATION ---
+        window.nav = (pageId) => {
+            ['page-start', 'page-login', 'page-dashboard'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // --- INIT DB ---
+        async function initDB() {
+            const docRef = doc(db, "santa", docId);
+            const docSnap = await getDoc(docRef);
+
+            if (!docSnap.exists()) {
+                const initialData = { status: "open", users: {} };
+                participants.forEach(p => {
+                    initialData.users[p] = { wishlist: [], target: null };
+                });
+                await setDoc(docRef, initialData);
+            }
+        }
+        initDB();
+
+        // --- LOGIN ---
+        window.login = (name) => {
+            currentUser = name;
+            document.getElementById('greeting').innerText = `HI ${name.toUpperCase()}! 💅`;
+            
+            window.nav('page-dashboard');
+
+            // Start Realtime Listener
+            onSnapshot(doc(db, "santa", docId), (doc) => {
+                groupData = doc.data();
+                renderDashboard();
+            });
+        }
+
+        window.logout = () => window.location.reload();
+
+        // --- RENDER DASHBOARD ---
+        function renderDashboard() {
+            if(!groupData || !currentUser) return;
+
+            const myData = groupData.users[currentUser];
+
+            // 1. Render My Wishlist
+            const listEl = document.getElementById('wishlist-display');
+            listEl.innerHTML = '';
+            if (myData.wishlist && myData.wishlist.length > 0) {
+                myData.wishlist.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-start border-b border-pink-200 pb-1";
+                    
+                    let content = `<span>🎀 ${item.name}</span>`;
+                    if(item.link) {
+                        content += ` <a href="${item.link}" target="_blank" class="text-blue-500 underline text-sm ml-2">[LINK]</a>`;
+                    }
+                    
+                    // Delete button
+                    const delBtn = document.createElement('button');
+                    delBtn.innerText = "✖";
+                    delBtn.className = "text-red-500 font-bold ml-2 hover:scale-125 transition";
+                    delBtn.onclick = () => deleteWish(item);
+
+                    li.innerHTML = content;
+                    li.appendChild(delBtn);
+                    listEl.appendChild(li);
+                });
+            } else {
+                listEl.innerHTML = '<li class="text-gray-400 italic">No wishes yet! Add something bestie.</li>';
+            }
+
+            // 2. Render Match Status
+            if (groupData.status === 'open') {
+                document.getElementById('status-open').classList.remove('hidden');
+                document.getElementById('status-drawn').classList.add('hidden');
+            } else {
+                document.getElementById('status-open').classList.add('hidden');
+                document.getElementById('status-drawn').classList.remove('hidden');
+
+                const targetName = myData.target;
+                document.getElementById('target-name').innerText = targetName;
+
+                // Render Target's Wishlist
+                const targetListEl = document.getElementById('target-wishlist');
+                const targetWishes = groupData.users[targetName].wishlist;
+                
+                targetListEl.innerHTML = '';
+                if(targetWishes && targetWishes.length > 0) {
+                    targetWishes.forEach(item => {
+                        let html = `<li>🎁 ${item.name}`;
+                        if(item.link) html += ` <a href="${item.link}" target="_blank" class="text-blue-500 underline">[LINK]</a>`;
+                        html += `</li>`;
+                        targetListEl.innerHTML += html;
+                    });
+                } else {
+                    targetListEl.innerHTML = '<li class="italic text-gray-500">They haven\'t asked for anything yet...</li>';
+                }
+            }
+        }
+
+        // --- ACTIONS ---
+        window.addWish = async () => {
+            const nameInput = document.getElementById('wish-item');
+            const linkInput = document.getElementById('wish-link');
+            const name = nameInput.value.trim();
+            const link = linkInput.value.trim();
+
+            if(!name) return alert("Type an item name first!");
+
+            const newItem = { name, link };
+            
+            // Optimistic UI update handled by snapshot, just send to DB
+            const docRef = doc(db, "santa", docId);
+            // We use arrayUnion to add to the specific user's wishlist array
+            // Note: Firestore path syntax for map fields
+            await updateDoc(docRef, {
+                [`users.${currentUser}.wishlist`]: arrayUnion(newItem)
+            });
+
+            nameInput.value = '';
+            linkInput.value = '';
+        }
+
+        window.deleteWish = async (itemObj) => {
+            if(!confirm("Remove this item?")) return;
+            const docRef = doc(db, "santa", docId);
+            await updateDoc(docRef, {
+                [`users.${currentUser}.wishlist`]: arrayRemove(itemObj)
+            });
+        }
+
+        window.drawNames = async () => {
+            if (!confirm("⚠️ WAIT! \n\nAre you sure you want to draw names now?\nThis will assign matches for EVERYONE permanently.")) return;
+
+            let givers = [...participants];
+            let receivers = [...participants];
+            let isValid = false;
+
+            // Logic: Shuffle until no one has themselves
+            while (!isValid) {
+                for (let i = receivers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [receivers[i], receivers[j]] = [receivers[j], receivers[i]];
+                }
+                isValid = givers.every((g, i) => g !== receivers[i]);
+            }
+
+            let updates = { status: "drawn" };
+            givers.forEach((giver, i) => {
+                updates[`users.${giver}.target`] = receivers[i];
+            });
+
+            const docRef = doc(db, "santa", docId);
+            await updateDoc(docRef, updates);
+        }
+    </script>
+</body>
+</html>

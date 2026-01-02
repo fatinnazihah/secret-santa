@@ -18,11 +18,9 @@
             background: var(--bg-grad);
             min-height: 100vh;
             overflow-x: hidden;
-            /* Changed cursor to a Camera */
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>📸</text></svg>") 16 0, auto;
         }
 
-        /* Y2K Scrollbar */
         ::-webkit-scrollbar { width: 12px; }
         ::-webkit-scrollbar-track { background: #ffccff; border-left: 2px solid #ff00ff; }
         ::-webkit-scrollbar-thumb { background: #ff00ff; border: 2px solid white; }
@@ -50,9 +48,13 @@
             box-shadow: 2px 2px 0px var(--purple);
         }
 
-        .title-text {
-            text-shadow: 3px 3px 0px #fff, 5px 5px 0px var(--purple);
+        .y2k-btn.secondary {
+            background: #cbd5e1; /* Gray for cancel */
+            color: #334155;
+            box-shadow: 4px 4px 0px #64748b;
         }
+
+        .title-text { text-shadow: 3px 3px 0px #fff, 5px 5px 0px var(--purple); }
 
         .pixel-input {
             border: 2px solid var(--purple);
@@ -62,30 +64,52 @@
         }
 
         .profile-pic {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border: 3px solid var(--pink);
-            transition: transform 0.2s;
+            width: 100px; height: 100px; object-fit: cover;
+            border: 3px solid var(--pink); transition: transform 0.2s;
         }
         .profile-btn:hover .profile-pic {
-            transform: scale(1.1) rotate(-5deg);
-            border-color: var(--purple);
+            transform: scale(1.1) rotate(-5deg); border-color: var(--purple);
         }
 
         .scanlines {
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
             background-size: 100% 4px;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 50;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; z-index: 40;
+        }
+
+        /* CUSTOM MODAL STYLES */
+        #custom-modal-overlay {
+            z-index: 100;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
         }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center justify-center text-purple-900">
     
     <div class="scanlines"></div>
+
+    <div id="custom-modal-overlay" class="hidden fixed inset-0 flex items-center justify-center p-4">
+        <div class="y2k-box w-full max-w-sm p-1">
+            <div class="bg-blue-700 text-white font-bold px-2 py-1 flex justify-between items-center mb-4">
+                <span id="modal-title">SYSTEM_ALERT.EXE</span>
+                <button onclick="closeModal(null)" class="hover:text-red-300">X</button>
+            </div>
+            
+            <div class="p-4 pt-0 text-center">
+                <div id="modal-icon" class="text-5xl mb-2">⚠️</div>
+                <p id="modal-message" class="text-xl mb-4 font-bold leading-tight"></p>
+                
+                <input id="modal-input" type="text" class="hidden pixel-input w-full p-2 mb-4 text-center" placeholder="...">
+
+                <div class="flex justify-center gap-4">
+                    <button id="modal-cancel" class="y2k-btn secondary px-4 py-1 text-lg hidden" onclick="closeModal(false)">CANCEL</button>
+                    <button id="modal-ok" class="y2k-btn px-6 py-1 text-lg" onclick="closeModal(true)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="page-start" class="text-center w-full max-w-lg">
         <marquee class="bg-purple-700 text-white font-bold py-1 border-y-2 border-white mb-8 text-xl">
@@ -145,7 +169,10 @@
         </div>
 
         <div class="y2k-box p-4 mb-8">
-            <h3 class="text-2xl font-bold bg-purple-200 inline-block px-2 mb-3 border border-purple-500">MY WISHLIST 📝</h3>
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-2xl font-bold bg-purple-200 inline-block px-2 border border-purple-500">MY WISHLIST 📝</h3>
+                <button onclick="changePin()" class="text-xs text-blue-500 underline hover:text-blue-700">Change PIN 🔑</button>
+            </div>
             
             <div class="flex flex-col gap-2 mb-4 bg-pink-50 p-3 border-2 border-pink-200 border-dashed">
                 <input id="wish-item" type="text" placeholder="Item Name (e.g. Instax Film)" class="pixel-input p-2 w-full outline-none focus:bg-white">
@@ -187,6 +214,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // -----------------------------------------------------
+        // TODO: PASTE FIREBASE CONFIG HERE
+        // -----------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyB3Y8HN2fqzwU4K-J6Bl1LY2pwv9GYzPgQ",
             authDomain: "secretsanta-26c70.firebaseapp.com",
@@ -197,10 +227,9 @@
         };
 
         // -----------------------------------------------------
-        // TODO: SET YOUR SECRET PINS HERE!
-        // Make sure you tell your friends their PINs privately
+        // INITIAL DEFAULT PINS (Only used if user hasn't set one)
         // -----------------------------------------------------
-        const USER_PINS = {
+        const DEFAULT_PINS = {
             "Fatin": "5618",
             "Damia": "8269",
             "Anis":  "1049",
@@ -215,6 +244,68 @@
         const docId = "penang_2026"; 
         let currentUser = null;
         let groupData = null;
+
+        // --- CUSTOM MODAL SYSTEM (Replaces Alert/Confirm/Prompt) ---
+        let modalResolver = null;
+
+        window.y2kAlert = (message, title="ALERT", icon="⚠️") => {
+            return new Promise(resolve => {
+                setupModal(title, message, icon, false, false);
+                modalResolver = resolve;
+            });
+        };
+
+        window.y2kConfirm = (message, title="CONFIRM", icon="🤔") => {
+            return new Promise(resolve => {
+                setupModal(title, message, icon, true, false);
+                modalResolver = resolve;
+            });
+        };
+
+        window.y2kPrompt = (message, title="INPUT", icon="⌨️") => {
+            return new Promise(resolve => {
+                setupModal(title, message, icon, true, true);
+                modalResolver = resolve;
+            });
+        };
+
+        function setupModal(title, message, icon, showCancel, showInput) {
+            document.getElementById('modal-title').innerText = title + ".EXE";
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-icon').innerText = icon;
+            
+            const cancelBtn = document.getElementById('modal-cancel');
+            const inputEl = document.getElementById('modal-input');
+            
+            if (showCancel) cancelBtn.classList.remove('hidden');
+            else cancelBtn.classList.add('hidden');
+
+            if (showInput) {
+                inputEl.classList.remove('hidden');
+                inputEl.value = '';
+                inputEl.focus();
+            } else {
+                inputEl.classList.add('hidden');
+            }
+
+            document.getElementById('custom-modal-overlay').classList.remove('hidden');
+        }
+
+        window.closeModal = (result) => {
+            const inputVal = document.getElementById('modal-input').value;
+            const isInputMode = !document.getElementById('modal-input').classList.contains('hidden');
+            
+            document.getElementById('custom-modal-overlay').classList.add('hidden');
+            
+            if (modalResolver) {
+                if (isInputMode && result === true) {
+                    modalResolver(inputVal); // Return text if prompt
+                } else {
+                    modalResolver(result); // Return true/false if confirm
+                }
+                modalResolver = null;
+            }
+        }
 
         // --- NAVIGATION ---
         window.nav = (pageId) => {
@@ -232,36 +323,61 @@
             if (!docSnap.exists()) {
                 const initialData = { status: "open", users: {} };
                 participants.forEach(p => {
-                    initialData.users[p] = { wishlist: [], target: null };
+                    // Set default PIN into Database on creation
+                    initialData.users[p] = { 
+                        wishlist: [], 
+                        target: null,
+                        pin: DEFAULT_PINS[p] 
+                    };
                 });
                 await setDoc(docRef, initialData);
             }
         }
         initDB();
 
-        // --- LOGIN WITH PIN CHECK ---
-        window.login = (name) => {
-            // Ask for PIN
-            let inputPin = prompt(`Enter secret PIN for ${name}:`);
+        // --- LOGIN WITH DATABASE PIN ---
+        window.login = async (name) => {
+            // Fetch current PIN from DB
+            const docRef = doc(db, "santa", docId);
+            const snapshot = await getDoc(docRef);
             
-            if (inputPin === USER_PINS[name]) {
-                // Success
+            if (!snapshot.exists()) return y2kAlert("Database Error!");
+            
+            const realPin = snapshot.data().users[name].pin || DEFAULT_PINS[name];
+
+            // Use Custom Prompt
+            let inputPin = await y2kPrompt(`Enter secret PIN for ${name}:`, "LOGIN REQUIRED", "🔒");
+            
+            if (inputPin === realPin) {
                 currentUser = name;
                 document.getElementById('greeting').innerText = `HI ${name.toUpperCase()}! 📸`;
                 window.nav('page-dashboard');
 
-                // Start Listener
                 onSnapshot(doc(db, "santa", docId), (doc) => {
                     groupData = doc.data();
                     renderDashboard();
                 });
-            } else {
-                // Fail
-                alert("WRONG PIN! NO SNOOPING ALLOWED! 👮‍♀️🚫");
+            } else if (inputPin !== null) { // If they didn't click cancel
+                y2kAlert("WRONG PIN! ACCESS DENIED! 👮‍♀️🚫", "SECURITY ALERT", "❌");
             }
         }
 
         window.logout = () => window.location.reload();
+
+        // --- NEW: CHANGE PIN FUNCTION ---
+        window.changePin = async () => {
+            const newPin = await y2kPrompt("Enter your new 4-digit PIN:", "UPDATE PASSWORD", "🔑");
+            
+            if (newPin && newPin.length >= 4) {
+                const docRef = doc(db, "santa", docId);
+                await updateDoc(docRef, {
+                    [`users.${currentUser}.pin`]: newPin
+                });
+                y2kAlert("PIN Updated Successfully!", "SUCCESS", "✅");
+            } else if (newPin !== null) {
+                y2kAlert("PIN must be at least 4 characters!", "ERROR", "⚠️");
+            }
+        }
 
         // --- RENDER DASHBOARD ---
         function renderDashboard() {
@@ -269,7 +385,7 @@
 
             const myData = groupData.users[currentUser];
 
-            // 1. Render My Wishlist
+            // Render Wishlist
             const listEl = document.getElementById('wishlist-display');
             listEl.innerHTML = '';
             if (myData.wishlist && myData.wishlist.length > 0) {
@@ -295,7 +411,7 @@
                 listEl.innerHTML = '<li class="text-gray-400 italic">No wishes yet! Add something bestie.</li>';
             }
 
-            // 2. Render Match Status
+            // Render Match Status
             if (groupData.status === 'open') {
                 document.getElementById('status-open').classList.remove('hidden');
                 document.getElementById('status-drawn').classList.add('hidden');
@@ -330,7 +446,8 @@
             const name = nameInput.value.trim();
             const link = linkInput.value.trim();
 
-            if(!name) return alert("Type an item name first!");
+            if(!name) return y2kAlert("Type an item name first!", "ERROR");
+
             const newItem = { name, link };
             const docRef = doc(db, "santa", docId);
             await updateDoc(docRef, { [`users.${currentUser}.wishlist`]: arrayUnion(newItem) });
@@ -338,13 +455,16 @@
         }
 
         window.deleteWish = async (itemObj) => {
-            if(!confirm("Remove this item?")) return;
+            const confirm = await y2kConfirm("Remove this item?", "DELETE ITEM");
+            if(!confirm) return;
+            
             const docRef = doc(db, "santa", docId);
             await updateDoc(docRef, { [`users.${currentUser}.wishlist`]: arrayRemove(itemObj) });
         }
 
         window.drawNames = async () => {
-            if (!confirm("⚠️ WAIT! \n\nAre you sure you want to draw names now?\nThis will assign matches for EVERYONE permanently.")) return;
+            const confirm = await y2kConfirm("Are you sure you want to draw names now?\nThis locks matches for EVERYONE!", "CRITICAL ACTION", "🚨");
+            if (!confirm) return;
 
             let givers = [...participants];
             let receivers = [...participants];
